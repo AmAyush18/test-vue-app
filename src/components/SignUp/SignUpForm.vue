@@ -14,7 +14,7 @@ import { ref } from 'vue'
 import useSignup from '../../firebase/useSignup.js'
 
 export default {
-    setup() {
+    setup(props, context) {
         const { error, signup } = useSignup()
 
         // refs
@@ -25,8 +25,8 @@ export default {
         const handleSubmit = async () => {
              await signup(email.value, password.value, displayName.value)
              if(!error.value) {
-                alert('user signed up successfully')
-            }
+                context.emit('signup')
+             }
         }
 
         return { displayName, email, password, handleSubmit, error }

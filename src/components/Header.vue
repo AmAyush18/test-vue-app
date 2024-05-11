@@ -1,5 +1,22 @@
-<script setup>
-    
+<script>
+    import getUser from '../firebase/getUser'
+    import useLogout from '../firebase/useLogout'
+
+    export default {
+        setup () {
+            const { user } = getUser()
+            const { logout, error } = useLogout()
+
+            const handleLogout = async () => {
+                await logout()
+                if (!error.value) {
+                    console.log('user logged out!')
+                }
+            }
+
+            return { user, handleLogout }
+        }
+    }
 </script>
 
 <template>
@@ -13,10 +30,15 @@
                 <a href="" class="hover:text-teal-300">Build</a>
             </div>
             <div class="flex gap-x-5 items-center text-white text-[20px]">
-                <a href="" class="hover:text-teal-300">English</a>
-                <router-link to="/signup" class="px-2 py-1 border border-white text-teal-300 rounded-[5px] hover:border-teal-300 hover:text-white">
+                <router-link v-if="!user" to="/signup" class="px-2 py-1 border border-white text-teal-300 rounded-[5px] hover:border-teal-300 hover:text-white">
                     Sign Up
                 </router-link>
+                <router-link v-if="!user" to="/login" class="px-2 py-1 border border-white text-teal-300 rounded-[5px] hover:border-teal-300 hover:text-white">
+                    Login
+                </router-link>
+                <button v-if="user" @click="handleLogout" class="px-2 py-1 border border-white text-teal-300 rounded-[5px] hover:border-teal-300 hover:text-white">
+                    Logout
+                </button>
             </div>
         </div>
     </div>

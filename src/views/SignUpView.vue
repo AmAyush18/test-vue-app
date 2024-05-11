@@ -1,13 +1,14 @@
 <script setup>
+import { useRouter } from 'vue-router';
 import SignUpForm from '../components/SignUp/SignUpForm.vue';
+
+const router = useRouter()
+
+const signedUp = () => {
+    router.push({ name: 'Home' })
+}
 </script>
 
 <template>
-    <SignUpForm />
+    <SignUpForm @signup="signedUp" />
 </template>
-
-<script>
-    export default {
-        name: 'SignUpView'
-    }
-</script>

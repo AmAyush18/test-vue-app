@@ -13,7 +13,7 @@ import { ref } from 'vue'
 import useLogin from '../../firebase/useLogin.js'
 
 export default {
-    setup() {
+    setup(props, context) {
         // refs
         const email = ref('')
         const password = ref('')
@@ -23,7 +23,8 @@ export default {
         const handleSubmit = async () => {
             await login(email.value, password.value)
             if(!error.value) {
-                alert('user logged in successfully')
+                // alert('user logged in successfully')
+                context.emit('login')
             }
         }
 
