@@ -20,7 +20,7 @@
 </script>
 
 <template>
-    <div class="w-full py-4 bg-[#1E1E1E]">
+    <div class="w-full py-4 bg-[#1E1E1E] shadow-xl">
         <div class="w-[90%] mx-auto flex items-center justify-between">
             <router-link to="/">
                 <img src="/vite.svg" alt="logo" class="w-[40px] h-[40px] object-cover">
