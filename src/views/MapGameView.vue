@@ -1,6 +1,7 @@
-<script>
+<script setup>
+import Map from '../components/MapGame/Map.vue'
 </script>
 
 <template>
-    <h2>Protected Map View Page</h2>
+    <Map />
 </template>
