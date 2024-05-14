@@ -28,7 +28,7 @@
                 <span @click="handleSelectZone(zone.id)" class="w-full cursor-pointer flex justify-between py-2 px-2 border rounded-md border-pink-200">
                     <p class="text-sm font-semibold text-orange-200">{{ zone.name }}</p>
                     <span class="flex gap-x-2 text-sm font-bold">
-                        <button @click.stop="editZoneName(zone)" class="py-1 px-2 bg-blue-400">
+                        <button @click="handleSelectZone(zone.id)" class="py-1 px-2 bg-blue-400">
                             E
                         </button>
                         <button @click="handleDeleteZone(zone.id)" class="py-1 px-2 bg-red-400">
@@ -136,7 +136,7 @@ async function saveZone() {
             path: path,
             createdAt: timestamp()
         })
-    console.log(res)
+    // console.log(res)
     load()
     cancelAdd()
 }
@@ -157,7 +157,7 @@ const handleSelectZone = async (id: string) => {
                 
     selectedZone.value = { ...res.data(), id: res.id }
     editZone(selectedZone.value.path)
-    console.log(selectedZone.value.path)
+    // console.log(selectedZone.value.path)
 }
 
 const editZoneName = (zone: any) => {
@@ -193,5 +193,6 @@ function cancelAdd() {
         polygon = null;
     }
     showAdd.value = false;
+    selectedZone.value = null;
 }
 </script>
