@@ -7,7 +7,9 @@ const getZones = () => {
 
     const load = async () => {
         try {
-            const res = await projectFirestore.collection('zones').get()
+            const res = await projectFirestore.collection('zones')
+                .orderBy('createdAt', 'desc')
+                .get()
 
             zones.value = res.docs.map(doc => {
                 // console.log(doc.data)

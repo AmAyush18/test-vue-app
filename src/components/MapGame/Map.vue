@@ -44,7 +44,7 @@
 <script setup lang="ts">
 import { Loader } from "@googlemaps/js-api-loader";
 import { onMounted, ref } from "vue";
-import { projectFirestore } from '../../firebase/config.js'
+import { projectFirestore, timestamp } from '../../firebase/config.js'
 import getZones from '../../firebase/getZones'
 
 const { zones, load, error } = getZones()
@@ -97,8 +97,11 @@ async function saveZone() {
         lng: latLng.lng(),
     }));
 
-    const res = await projectFirestore.collection('zones').add({name: zoneName.value,
-            path: path,})
+    const res = await projectFirestore.collection('zones').add({
+            name: zoneName.value,
+            path: path,
+            createdAt: timestamp()
+        })
     console.log(res)
     load()
     cancelAdd()
