@@ -3,7 +3,7 @@
     <div class="w-[95%] mx-auto flex flex-col gap-2 md:flex-row md:justify-between items-center">
         <div id="map" class="w-full md:w-[75%] min-h-[85vh] border border-teal-300 rounded-md"></div>
         <div class="md:w-[22%] border border-orange-200 px-3 py-2 rounded-md space-y-4">
-            <h1 class="font-semibold text-pink-100">Map Zones</h1>
+            <h1 class="text-lg font-semibold text-pink-100">Map Zones</h1>
             <div v-if="!showAdd">
                 <button v-on:click="showAdd = !showAdd" class="border rounded-md px-7 w-full py-2 font-semibold text-green-500 border-green-500
             hover:bg-green-500 hover:text-white transition-colors duration-300 ease-in
@@ -22,6 +22,21 @@
                     Save Zone
                 </button>
             </div>
+            <div class="border-t-2 border-dashed border-teal-200 w-full h-2 mt-5" />
+            <h2 class="text-lg font-semibold text-purple-300">Saved Zones</h2>
+            <div class="flex flex-col gap-y-1" v-for="(zone, id) in zones" :key="id">
+                <span class="w-full flex justify-between py-2 px-2 border rounded-md border-pink-200">
+                    <p class="text-sm font-semibold text-orange-200">{{ zone.name }}</p>
+                    <span class="flex gap-x-2 text-sm font-bold">
+                        <button class="py-1 px-2 bg-blue-400">
+                            E
+                        </button>
+                        <button class="py-1 px-2 bg-red-400">
+                            D
+                        </button>
+                    </span>
+                </span>
+            </div>
         </div>
     </div>
 </template>
@@ -30,6 +45,9 @@
 import { Loader } from "@googlemaps/js-api-loader";
 import { onMounted, ref } from "vue";
 import { projectFirestore } from '../../firebase/config.js'
+import getZones from '../../firebase/getZones'
+
+const { zones, load, error } = getZones()
 
 const zoneName = ref("");
 
@@ -82,6 +100,7 @@ async function saveZone() {
     const res = await projectFirestore.collection('zones').add({name: zoneName.value,
             path: path,})
     console.log(res)
+    load()
     cancelAdd()
 }
 

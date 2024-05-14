@@ -2,7 +2,7 @@ import { ref } from 'vue'
 import { projectFirestore } from './config'
 
 const getZones = () => {
-    const zones = ref({})
+    const zones = ref([])
     const error = ref(null)
 
     const load = async () => {
@@ -10,15 +10,20 @@ const getZones = () => {
             const res = await projectFirestore.collection('zones').get()
 
             zones.value = res.docs.map(doc => {
+                // console.log(doc.data)
                 return { ...doc.data(), id:doc.id }
             })
+
+            console.log(zones.value)
         } catch (err) {
             error.value = err.message
             console.log(error.value)
         }
     }
 
-    return { zones, error, load}
+    load()
+
+    return { zones, error, load }
 }
 
 export default getZones
