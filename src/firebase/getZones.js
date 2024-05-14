@@ -16,7 +16,7 @@ const getZones = () => {
                 return { ...doc.data(), id:doc.id }
             })
 
-            console.log(zones.value)
+            // console.log(zones.value)
         } catch (err) {
             error.value = err.message
             console.log(error.value)

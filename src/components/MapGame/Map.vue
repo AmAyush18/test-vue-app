@@ -25,16 +25,32 @@
             <div class="border-t-2 border-dashed border-teal-200 w-full h-2 mt-5" />
             <h2 class="text-lg font-semibold text-purple-300">Saved Zones</h2>
             <div class="flex flex-col gap-y-1" v-for="(zone, id) in zones" :key="id">
-                <span class="w-full flex justify-between py-2 px-2 border rounded-md border-pink-200">
+                <span @click="handleSelectZone(zone.id)" class="w-full cursor-pointer flex justify-between py-2 px-2 border rounded-md border-pink-200">
                     <p class="text-sm font-semibold text-orange-200">{{ zone.name }}</p>
                     <span class="flex gap-x-2 text-sm font-bold">
-                        <button class="py-1 px-2 bg-blue-400">
+                        <button @click.stop="editZoneName(zone)" class="py-1 px-2 bg-blue-400">
                             E
                         </button>
                         <button @click="handleDeleteZone(zone.id)" class="py-1 px-2 bg-red-400">
                             D
                         </button>
                     </span>
+                </span>
+            </div>
+            <div v-if="selectedZone" class="flex flex-col gap-y-2">
+                <input v-model="selectedZone.name" placeholder="Enter new zone name" class="w-full border border-blue-200 bg-transparent rounded-md px-3 py-2">
+                <span class="w-full flex justify-between">
+
+                    <button @click="updateZone" class="border rounded-md px-7 w-[48%] py-2 font-semibold text-blue-500 border-blue-500
+                            hover:bg-blue-500 hover:text-white transition-colors duration-300 ease-in"
+                    >
+                        Save
+                    </button>
+                    <button @click="cancelAdd" class="border rounded-md px-7 w-[48%] py-2 font-semibold text-red-500 border-red-500
+                            hover:bg-red-500 hover:text-white transition-colors duration-300 ease-in"
+                    >
+                        Cancel
+                    </button>
                 </span>
             </div>
         </div>
@@ -46,10 +62,12 @@ import { Loader } from "@googlemaps/js-api-loader";
 import { onMounted, ref } from "vue";
 import { projectFirestore, timestamp } from '../../firebase/config.js'
 import getZones from '../../firebase/getZones'
+import getZone from '../../firebase/getZone'
 
 const { zones, load, error } = getZones()
 
 const zoneName = ref("");
+const selectedZone = ref<any>(null);
 
 const showAdd = ref(false);
 let map: google.maps.Map;
@@ -90,6 +108,22 @@ function addPoint(latLng: google.maps.LatLng) {
     path.push(latLng);
 }
 
+function editZone(path: any) {
+    if (!polygon) {
+        polygon = new google.maps.Polygon({
+            strokeColor: "#c2410c",
+            strokeOpacity: 0.8,
+            strokeWeight: 2,
+            fillColor: "#fdba74",
+            fillOpacity: 0.35,
+            editable: true,
+            draggable: true,
+            map: map,
+        });
+    }
+    polygon.setPath(path.map((point: {lat: number, lng: number}) => new google.maps.LatLng(point.lat, point.lng)));
+}
+
 async function saveZone() {
     if (!polygon && !zoneName.value) return;
     const path = polygon.getPath().getArray().map((latLng) => ({
@@ -113,6 +147,44 @@ async function handleDeleteZone(id: string) {
         .delete()
     
     load()
+}
+
+const handleSelectZone = async (id: string) => {
+
+    const res = await projectFirestore.collection('zones')
+                .doc(id)
+                .get()
+                
+    selectedZone.value = { ...res.data(), id: res.id }
+    editZone(selectedZone.value.path)
+    console.log(selectedZone.value.path)
+}
+
+const editZoneName = (zone: any) => {
+    selectedZone.value = { ...zone }
+}
+
+async function updateZone() {
+    if (!polygon || !selectedZone.value) return;
+    
+    const path = polygon.getPath().getArray().map((latLng) => ({
+        lat: latLng.lat(),
+        lng: latLng.lng(),
+    }));
+
+    await projectFirestore.collection('zones')
+        .doc(selectedZone.value.id)
+        .update({
+            name: selectedZone.value.name,
+            path: path
+        })
+    
+    load()
+    selectedZone.value = null;
+    if (polygon) {
+        polygon.setMap(null);
+        polygon = null;
+    }
 }
 
 function cancelAdd() {
