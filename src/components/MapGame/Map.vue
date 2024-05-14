@@ -31,7 +31,7 @@
                         <button class="py-1 px-2 bg-blue-400">
                             E
                         </button>
-                        <button class="py-1 px-2 bg-red-400">
+                        <button @click="handleDeleteZone(zone.id)" class="py-1 px-2 bg-red-400">
                             D
                         </button>
                     </span>
@@ -102,6 +102,14 @@ async function saveZone() {
     console.log(res)
     load()
     cancelAdd()
+}
+
+async function handleDeleteZone(id: string) {
+    await projectFirestore.collection('zones')
+        .doc(id)
+        .delete()
+    
+    load()
 }
 
 function cancelAdd() {
