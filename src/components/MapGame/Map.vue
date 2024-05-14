@@ -1,8 +1,8 @@
 <template>
     <h2 class="text-center text-3xl text-orange-200 font-semibold my-3">Map Game, Play around..!!</h2>
-    <div class="w-[95%] mx-auto flex flex-col gap-2 md:flex-row md:justify-between items-center">
+    <div class="w-[95%] mx-auto flex flex-col gap-y-4 md:flex-row md:justify-between items-center">
         <div id="map" class="w-full md:w-[75%] min-h-[85vh] border border-teal-300 rounded-md"></div>
-        <div class="md:w-[22%] border border-orange-200 px-3 py-2 rounded-md space-y-4">
+        <div class="w-[95%] md:w-[22%] border border-orange-200 px-3 py-2 rounded-md space-y-4">
             <h1 class="text-lg font-semibold text-pink-100">Map Zones</h1>
             <div v-if="!showAdd">
                 <button v-on:click="showAdd = !showAdd" class="border rounded-md px-7 w-full py-2 font-semibold text-green-500 border-green-500
