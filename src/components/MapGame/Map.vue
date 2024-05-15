@@ -23,6 +23,12 @@
                 </button>
             </div>
             <div class="border-t-2 border-dashed border-teal-200 w-full h-2 mt-5" />
+            <div class="py-2 px-2 border border-dashed border-blue-300 w-full flex justify-between items-center">
+                <h3 class="text-[16px] font-semibold text-blue-500">All zones</h3>
+                <button @click="toggleAllZones" class="border rounded-md px-4 py-1 font-semibold text-violet-500 border-violet-500 hover:bg-violet-400 hover:text-white transition-colors duration-300 ease-in">
+                    {{ showZones ? 'Hide' : 'Show' }}
+                </button>
+            </div>
             <h2 class="text-lg font-semibold text-purple-300">Saved Zones</h2>
             <div class="flex flex-col gap-y-1" v-for="(zone, id) in zones" :key="id">
                 <span @click="handleSelectZone(zone.id)" class="w-full cursor-pointer flex justify-between py-2 px-2 border rounded-md border-pink-200">
@@ -62,16 +68,17 @@ import { Loader } from "@googlemaps/js-api-loader";
 import { onMounted, ref } from "vue";
 import { projectFirestore, timestamp } from '../../firebase/config.js'
 import getZones from '../../firebase/getZones'
-import getZone from '../../firebase/getZone'
 
 const { zones, load, error } = getZones()
 
 const zoneName = ref("");
 const selectedZone = ref<any>(null);
-
 const showAdd = ref(false);
+const showZones = ref(true);
+
 let map: google.maps.Map;
 let polygon: google.maps.Polygon | null = null;
+let zonePolygons: google.maps.Polygon[] = [];
 
 const loader = new Loader({
     apiKey: "AIzaSyDdO-p2vd8fMG4W8CkeOfBhc22iz2Iwcqk",
@@ -89,7 +96,43 @@ onMounted(async () => {
             addPoint(event.latLng);
         }
     });
+
+    loadZones()
 });
+
+function getRandomColor() {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
+
+async function loadZones() {
+    await load();
+    zones.value.forEach((zone) => {
+        const path = zone.path.map(point => new google.maps.LatLng(point.lat, point.lng));
+        const color = getRandomColor()
+        const polygon = new google.maps.Polygon({
+            paths: path,
+            strokeColor: color,
+            strokeOpacity: 0.8,
+            strokeWeight: 2,
+            fillColor: color,
+            fillOpacity: 0.45,
+            map: map,
+        });
+        zonePolygons.push(polygon);
+    });
+}
+
+function toggleAllZones() {
+    showZones.value = !showZones.value;
+    zonePolygons.forEach(polygon => {
+        polygon.setMap(showZones.value ? map : null);
+    });
+}
 
 function addPoint(latLng: google.maps.LatLng) {
     if (!polygon) {
@@ -109,6 +152,9 @@ function addPoint(latLng: google.maps.LatLng) {
 }
 
 function editZone(path: any) {
+    if(showZones.value){
+        toggleAllZones()
+    }
     if (!polygon) {
         polygon = new google.maps.Polygon({
             strokeColor: "#c2410c",
