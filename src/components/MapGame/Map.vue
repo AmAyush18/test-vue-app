@@ -11,16 +11,21 @@
             </div>
             <div v-if="showAdd" class="flex flex-col gap-y-2">
                 <input v-model="zoneName" placeholder="Enter zone name" class="w-full border border-blue-200 bg-transparent rounded-md px-3 py-2">
-                <button @click="cancelAdd" class="border rounded-md px-7 w-full py-2 font-semibold text-red-500 border-red-500
-                    hover:bg-red-500 hover:text-white transition-colors duration-300 ease-in"
-                >
-                    Cancel
+                <button @click="undoLastPoint" class="w-full border rounded-md px-4 py-2 font-semibold text-yellow-500 border-yellow-500 hover:bg-yellow-500 hover:text-white transition-colors duration-300 ease-in">
+                    Undo
                 </button>
-                <button @click="saveZone" class="border rounded-md px-7 w-full py-2 font-semibold text-blue-500 border-blue-500
-                    hover:bg-blue-500 hover:text-white transition-colors duration-300 ease-in"
-                >
-                    Save Zone
-                </button>
+                <div class="w-full flex justify-between">
+                    <button @click="saveZone" class="border rounded-md px-7 w-[49%] py-2 font-semibold text-blue-500 border-blue-500
+                        hover:bg-blue-500 hover:text-white transition-colors duration-300 ease-in"
+                    >
+                        Save Zone
+                    </button>
+                    <button @click="cancelAdd" class="border rounded-md px-7 w-[49%] py-2 font-semibold text-red-500 border-red-500
+                        hover:bg-red-500 hover:text-white transition-colors duration-300 ease-in"
+                    >
+                        Cancel
+                    </button>
+                </div>
             </div>
             <div class="border-t-2 border-dashed border-teal-200 w-full h-2 mt-5" />
             <div class="py-2 px-2 border border-dashed border-blue-300 w-full flex justify-between items-center">
@@ -31,7 +36,7 @@
             </div>
             <h2 class="text-lg font-semibold text-purple-300">Saved Zones</h2>
             <div class="flex flex-col gap-y-1" v-for="(zone, id) in zones" :key="id">
-                <span @click="handleSelectZone(zone.id)" class="w-full cursor-pointer flex justify-between py-2 px-2 border rounded-md border-pink-200">
+                <span class="w-full cursor-pointer flex justify-between py-2 px-2 border rounded-md border-pink-200">
                     <p class="text-sm font-semibold text-orange-200">{{ zone.name }}</p>
                     <span class="flex gap-x-2 text-sm font-bold">
                         <button @click="handleSelectZone(zone.id)" class="py-1 px-2 bg-blue-400">
@@ -83,6 +88,7 @@ let zonePolygons: google.maps.Polygon[] = [];
 const loader = new Loader({
     apiKey: "AIzaSyDdO-p2vd8fMG4W8CkeOfBhc22iz2Iwcqk",
     version: "weekly",
+    libraries: ['geometry']
 });
 
 onMounted(async () => {
@@ -151,6 +157,15 @@ function addPoint(latLng: google.maps.LatLng) {
     path.push(latLng);
 }
 
+function undoLastPoint() {
+    if (polygon) {
+        const path = polygon.getPath();
+        if (path.getLength() > 0) {
+            path.pop();
+        }
+    }
+}
+
 function editZone(path: any) {
     if(showZones.value){
         toggleAllZones()
@@ -170,8 +185,38 @@ function editZone(path: any) {
     polygon.setPath(path.map((point: {lat: number, lng: number}) => new google.maps.LatLng(point.lat, point.lng)));
 }
 
+function checkZonesIntersection(zone1: google.maps.Polygon, zone2: google.maps.Polygon): boolean {
+    const path1 = zone1.getPath().getArray();
+    const path2 = zone2.getPath().getArray();
+
+    // Check if any vertex of zone1 is inside zone2
+    for (let i = 0; i < path1.length; i++) {
+        if (google.maps.geometry.poly.containsLocation(path1[i], zone2)) {
+            return true;
+        }
+    }
+
+    // Check if any vertex of zone2 is inside zone1
+    for (let i = 0; i < path2.length; i++) {
+        if (google.maps.geometry.poly.containsLocation(path2[i], zone1)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 async function saveZone() {
     if (!polygon && !zoneName.value) return;
+
+    // Check for intersection/overlaps within existing zones
+    for (const oldZone of zonePolygons) {
+        if (checkZonesIntersection(polygon, oldZone)) {
+            alert("New zone overlaps with an existing zone. Please adjust the boundaries.");
+            return;
+        }
+    }
+
     const path = polygon.getPath().getArray().map((latLng) => ({
         lat: latLng.lat(),
         lng: latLng.lng(),
@@ -184,6 +229,7 @@ async function saveZone() {
         })
     // console.log(res)
     load()
+    zonePolygons.push(polygon)
     cancelAdd()
 }
 
@@ -212,6 +258,14 @@ const editZoneName = (zone: any) => {
 
 async function updateZone() {
     if (!polygon || !selectedZone.value) return;
+
+    // Check for intersection/overlaps within existing zones
+    for (const oldZone of zonePolygons) {
+        if (oldZone !== polygon && checkZonesIntersection(polygon, oldZone)) {
+            alert("Updated zone overlaps with an existing zone. Please adjust the boundaries and try again!");
+            return;
+        }
+    }
     
     const path = polygon.getPath().getArray().map((latLng) => ({
         lat: latLng.lat(),
