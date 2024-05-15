@@ -207,7 +207,12 @@ function checkZonesIntersection(zone1: google.maps.Polygon, zone2: google.maps.P
 }
 
 async function saveZone() {
-    if (!polygon && !zoneName.value) return;
+    if (!polygon) return;
+
+    if(zoneName.value.length === 0){
+        alert("Please name your zone")
+        return
+    }
 
     // Check for intersection/overlaps within existing zones
     for (const oldZone of zonePolygons) {
@@ -228,9 +233,11 @@ async function saveZone() {
             createdAt: timestamp()
         })
     // console.log(res)
-    load()
-    zonePolygons.push(polygon)
     cancelAdd()
+    loadZones()
+    if(!showZones.value){
+        toggleAllZones()
+    }
 }
 
 async function handleDeleteZone(id: string) {
@@ -238,7 +245,10 @@ async function handleDeleteZone(id: string) {
         .doc(id)
         .delete()
     
-    load()
+    loadZones()
+    if(!showZones.value){
+        toggleAllZones()
+    }
 }
 
 const handleSelectZone = async (id: string) => {
@@ -257,7 +267,12 @@ const editZoneName = (zone: any) => {
 }
 
 async function updateZone() {
-    if (!polygon || !selectedZone.value) return;
+    if (!polygon) return;
+
+    if(zoneName.value.length === 0){
+        alert("Please name your zone")
+        return
+    }
 
     // Check for intersection/overlaps within existing zones
     for (const oldZone of zonePolygons) {
