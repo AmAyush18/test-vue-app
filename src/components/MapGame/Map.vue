@@ -37,7 +37,7 @@
             <h2 class="text-lg font-semibold text-purple-300">Saved Zones</h2>
             <div class="flex flex-col gap-y-1" v-for="(zone, id) in zones" :key="id">
                 <span class="w-full cursor-pointer flex justify-between py-2 px-2 border rounded-md border-pink-200">
-                    <p class="text-sm font-semibold text-orange-200">{{ zone.name }}</p>
+                    <p @click="handleSelectZone(zone.id)" class="text-sm flex-1 font-semibold text-orange-200">{{ zone.name }}</p>
                     <span class="flex gap-x-2 text-sm font-bold">
                         <button @click="handleSelectZone(zone.id)" class="py-1 px-2 bg-blue-400">
                             E
@@ -77,7 +77,7 @@ import getZones from '../../firebase/getZones'
 const { zones, load, error } = getZones()
 
 const zoneName = ref("");
-const selectedZone = ref<any>(null);
+const selectedZone = ref(null);
 const showAdd = ref(false);
 const showZones = ref(true);
 
@@ -241,6 +241,7 @@ async function saveZone() {
 }
 
 async function handleDeleteZone(id: string) {
+    selectedZone.value = false
     await projectFirestore.collection('zones')
         .doc(id)
         .delete()
