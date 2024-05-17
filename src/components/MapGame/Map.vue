@@ -263,21 +263,24 @@ const handleSelectZone = async (id: string) => {
     // console.log(selectedZone.value.path)
 }
 
-const editZoneName = (zone: any) => {
-    selectedZone.value = { ...zone }
-}
-
 async function updateZone() {
     if (!polygon) return;
 
-    if(zoneName.value.length === 0){
+    if(selectedZone.value?.name.length === 0){
         alert("Please name your zone")
         return
     }
 
     // Check for intersection/overlaps within existing zones
     for (const oldZone of zonePolygons) {
-        if (oldZone !== polygon && checkZonesIntersection(polygon, oldZone)) {
+
+        const oldZoneId = zones.value.find(zone => 
+            zone.path.every((point, index) => 
+                point.lat === oldZone.getPath().getAt(index).lat() && 
+                point.lng === oldZone.getPath().getAt(index).lng())
+            )?.id;
+
+        if (oldZoneId !== selectedZone.value.id && checkZonesIntersection(polygon, oldZone)) {
             alert("Updated zone overlaps with an existing zone. Please adjust the boundaries and try again!");
             return;
         }

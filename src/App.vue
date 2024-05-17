@@ -3,8 +3,14 @@
 </script>
 
 <template>
-  <Header />
-  <router-view />
+  <div class="flex flex-col">
+    <div class="h-[60px] flex-shrink-0">
+      <Header />
+    </div>
+    <div class="flex-1">
+      <router-view />
+    </div>
+  </div>
 </template>
 
 <script>

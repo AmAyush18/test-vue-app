@@ -1,26 +1,5 @@
-<script>
-    import getUser from '../firebase/getUser'
-    import useLogout from '../firebase/useLogout'
-
-    export default {
-        setup () {
-            const { user } = getUser()
-            const { logout, error } = useLogout()
-
-            const handleLogout = async () => {
-                await logout()
-                if (!error.value) {
-                    console.log('user logged out!')
-                }
-            }
-
-            return { user, handleLogout }
-        }
-    }
-</script>
-
 <template>
-    <div class="w-full py-4 bg-[#1E1E1E] shadow-xl">
+    <div class="w-full py-4 bg-[#1E1E1E] shadow-xl fixed top-0 left-0 right-0 h-[70px]">
         <div class="w-[90%] mx-auto flex items-center justify-between">
             <router-link to="/">
                 <img src="/vite.svg" alt="logo" class="w-[40px] h-[40px] object-cover">
@@ -43,3 +22,24 @@
         </div>
     </div>
 </template>
+
+<script>
+    import getUser from '../firebase/getUser'
+    import useLogout from '../firebase/useLogout'
+
+    export default {
+        setup () {
+            const { user } = getUser()
+            const { logout, error } = useLogout()
+
+            const handleLogout = async () => {
+                await logout()
+                if (!error.value) {
+                    console.log('user logged out!')
+                }
+            }
+
+            return { user, handleLogout }
+        }
+    }
+</script>
