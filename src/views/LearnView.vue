@@ -28,12 +28,15 @@ const Filters = defineAsyncComponent(() => import('../components/Learn/Filters.v
 const Plugins = defineAsyncComponent(() => import('../components/Learn/Plugins.vue'));
 const Vuex = defineAsyncComponent(() => import('../components/Learn/Vuex.vue'));
 const VueRouter = defineAsyncComponent(() => import('../components/Learn/VueRouter.vue'));
+const CompositionApi = defineAsyncComponent(() => import('../components/Learn/CompositionApi.vue'));
+const Slots = defineAsyncComponent(() => import('../components/Learn/Slots.vue'));
 
 // Map of component names to component objects
 const componentMap = {
   Introduction,
   Instance,
   TemplateSyntax,
+  CompositionApi,
   Directives,
   DataBinding,
   Methods,
@@ -43,6 +46,7 @@ const componentMap = {
   Mixin,
   Filters,
   Plugins,
+  Slots,
   Vuex,
   VueRouter
 };

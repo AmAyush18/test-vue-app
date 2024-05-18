@@ -26,6 +26,7 @@
         { name: 'Introduction', component: 'Introduction' },
         { name: 'Instance', component: 'Instance' },
         { name: 'TemplateSyntax', component: 'TemplateSyntax' },
+        { name: 'CompositionApi', component: 'CompositionApi' },
         { name: 'Directives', component: 'Directives' },
         { name: 'DataBinding', component: 'DataBinding' },
         { name: 'Methods', component: 'Methods' },
@@ -35,6 +36,7 @@
         { name: 'Mixin', component: 'Mixin' },
         { name: 'Filters', component: 'Filters' },
         { name: 'Plugins', component: 'Plugins' },
+        { name: 'Slots', component: 'Slots' },
         { name: 'Vuex', component: 'Vuex' },
         { name: 'VueRouter', component: 'VueRouter' }
       ]);
